@@ -2,6 +2,7 @@
 import type { PaginationData } from "@@/composables/usePagination"
 import type { DictTypeForm, DictTypeQuery } from "@/common/apis/admin/dict/type/types"
 import { useDevice } from "@@/composables/useDevice"
+import { formatDateTime } from "@@/utils/index"
 import { CirclePlus, RefreshRight } from "@element-plus/icons-vue"
 import { ref } from "vue"
 
@@ -84,6 +85,11 @@ const handleSelectionChange = (val: DictTypeForm[]) => (selectedRows.value = val
           </template>
         </el-table-column>
         <el-table-column prop="remark" label="备注" align="center" />
+        <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+          <template #default="scope">
+            <span>{{ formatDateTime(scope.row.createTime) }}</span>
+          </template>
+        </el-table-column>
         <el-table-column fixed="right" label="操作" :width="isMobile ? 100 : 130" align="center">
           <template #default="scope">
             <slot name="operation" :scope="scope" />

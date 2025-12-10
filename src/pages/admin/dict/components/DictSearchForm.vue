@@ -29,8 +29,9 @@ const searchFormRef = ref<FormInstance | null>(null)
 
 const dateRange = ref<[DateModelType, DateModelType]>(["", ""])
 watch(dateRange, ([newBeginTime, newEndTime]) => {
-  searchData.value.beginTime = newBeginTime
-  searchData.value.endTime = newEndTime
+  searchData.value.params = {}
+  searchData.value.params.beginTime = newBeginTime.toLocaleString()
+  searchData.value.params.endTime = newEndTime.toLocaleString()
 })
 
 function resetSearch() {

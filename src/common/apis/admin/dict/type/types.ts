@@ -15,6 +15,8 @@ export interface DictTypeForm {
 export interface DictTypeQuery extends PageQuery {
   dictName?: string
   dictType?: string
-  beginTime?: string | number | Date
-  endTime?: string | number | Date
+  params?: {
+    beginTime?: string
+    endTime?: string
+  }
 }

@@ -27,8 +27,10 @@ const formData = ref<Partial<DictTypeForm>>(cloneDeep({}))
 const searchData = reactive({
   dictName: "",
   dictType: "",
-  beginTime: "",
-  endTime: ""
+  params: {
+    beginTime: "",
+    endTime: ""
+  }
 } as DictTypeQuery)
 
 // 数据弹窗
@@ -124,6 +126,7 @@ function openShowDialog(row: any) {
 async function getTableData(params?: DictTypeQuery): Promise<void> {
   try {
     loading.value = true
+    console.log(params)
     await getSysDictListTypeApi({
       pageNum: paginationData.currentPage,
       pageSize: paginationData.pageSize,
