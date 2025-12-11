@@ -54,6 +54,9 @@ export const constantRoutes: RouteRecordRaw[] = [
     path: "/admin",
     component: Layouts,
     redirect: "/admin/dashboard",
+    meta: {
+      title: "系统管理"
+    },
     children: [
       {
         path: "dashboard",
@@ -66,18 +69,13 @@ export const constantRoutes: RouteRecordRaw[] = [
         }
       },
       {
-        path: "/dict",
-        children: [
-          {
-            path: "",
-            component: () => import("@/pages/admin/dict/index.vue"),
-            name: "Dict",
-            meta: {
-              title: "字典管理",
-              svgIcon: "dashboard"
-            }
-          }
-        ]
+        path: "dict",
+        component: () => import("@/pages/admin/dict/index.vue"),
+        name: "Dict",
+        meta: {
+          title: "字典管理",
+          svgIcon: "dashboard"
+        }
       }
     ]
   }

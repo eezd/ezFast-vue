@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { FormInstance, FormRules } from "element-plus"
+import type { DictTypeForm } from "@/common/apis/admin/dict/type/types"
 import { useDevice } from "@@/composables/useDevice"
 import { ElMessage } from "element-plus"
 import { cloneDeep } from "lodash-es"
@@ -13,7 +14,7 @@ import { addSysDictTypeApi, updateSysDictTypeApi } from "@/common/apis/admin/dic
 const loading = defineModel<boolean>("loading", { required: true })
 const isEditable = defineModel<boolean>("isEditable", { default: false })
 const dialogVisible = defineModel<boolean>("dataDialogVisible", { required: true })
-const formData = defineModel<any>(
+const formData = defineModel<Partial<DictTypeForm>>(
   "formData",
   {
     required: true
@@ -23,15 +24,14 @@ const formData = defineModel<any>(
 
 const title = computed(() => {
   if (!isEditable.value) return "查看字典"
-  return formData.value.roleId === undefined ? "新增字典" : "编辑字典"
+  return formData.value.dictId === undefined ? "新增字典" : "编辑字典"
 })
 
 const { isMobile } = useDevice()
 
-// 组件实例 (权限树)
 const formRef = ref<FormInstance | null>(null)
 
-const formRules: FormRules<any> = {
+const formRules: FormRules<DictTypeForm> = {
   dictName: [
     {
       required: true,
@@ -59,10 +59,10 @@ function handleCreateOrUpdate() {
         loading.value = true
         const isCreating = formData.value.dictId === undefined
         if (isCreating) {
-          const res = await addSysDictTypeApi(formData.value)
+          const res = await addSysDictTypeApi(formData.value as DictTypeForm)
           ElMessage.success(res.msg)
         } else {
-          const res = await updateSysDictTypeApi(formData.value)
+          const res = await updateSysDictTypeApi(formData.value as DictTypeForm)
           ElMessage.success(res.msg)
           ElMessage.success("操作成功")
         }

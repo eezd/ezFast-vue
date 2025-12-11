@@ -38,15 +38,15 @@ const getTableData = () => emit("getTableData")
 
 const { isMobile } = useDevice()
 
-const selectedRows = ref<any[]>([])
+const selectedRows = ref<DictTypeForm[]>([])
 
 const handleSelectionChange = (val: DictTypeForm[]) => (selectedRows.value = val)
 </script>
 
 <template>
   <el-card v-loading="loading" shadow="never">
-    <div class="toolbar-wrapper" :style="isMobile ? 'flex-direction: row; gap: 15px' : ''">
-      <div>
+    <div class="toolbar-wrapper">
+      <div :style="isMobile ? 'display:flex; gap: 10px; flex-wrap: wrap;' : ''">
         <el-button
           type="primary"
           :icon="CirclePlus"
@@ -77,7 +77,7 @@ const handleSelectionChange = (val: DictTypeForm[]) => (selectedRows.value = val
       <el-table :data="tableData" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="50" align="center" />
         <el-table-column prop="dictName" label="字典名称" align="center" />
-        <el-table-column label="字典类型" align="center" :show-overflow-tooltip="true">
+        <el-table-column label="字典类型" align="center">
           <template #default="scope">
             <router-link :to="`/system/dict-data/index/${scope.row.dictId}`" class="link-type">
               <span>{{ scope.row.dictType }}</span>

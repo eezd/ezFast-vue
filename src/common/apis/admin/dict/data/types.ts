@@ -2,6 +2,7 @@ export interface DictDataQuery extends PageQuery {
   dictName: string
   dictType: string
   dictLabel: string
+
 }
 
 export interface DictDataVO extends BaseEntity {
