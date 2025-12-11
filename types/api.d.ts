@@ -5,13 +5,6 @@ interface ApiResponseData<T> {
   msg: string
 }
 
-interface ApiResponseListData<T> {
-  total: number
-  code: number
-  rows: T
-  msg: string
-}
-
 interface ApiResponsePageData<T> {
   total: number
   code: number

@@ -1,25 +1,31 @@
 <script lang="ts" setup>
 import type { FormInstance } from "element-plus"
-import type { DictTypeForm, DictTypeQuery } from "@/common/apis/admin/dict/type/types"
+import type { DictDataForm, DictDataQuery } from "@/common/apis/admin/dict/data/types"
+import type { DictTypeVO } from "@/common/apis/admin/dict/type/types"
 import { usePagination } from "@@/composables/usePagination"
 import { Delete, Refresh, Search } from "@element-plus/icons-vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { cloneDeep } from "lodash-es"
 import { ref, watch } from "vue"
-import { delSysDictTypeApi, getSysDictListTypeApi } from "@/common/apis/admin/dict/type"
+import { useRoute } from "vue-router"
+import { delSysDictDataApi, getSysDictDataListApi } from "@/common/apis/admin/dict/data"
+import { getSysDictOptionSelectApi, getSysDictTypeApi } from "@/common/apis/admin/dict/type"
 import { download } from "@/common/utils/test"
 import DictDataDialog from "./components/DictDialog.vue"
 import DictTable from "./components/DictTable.vue"
 
 defineOptions({
-  name: "AdminSysDict"
+  name: "AdminSysDictData"
 })
+
+const route = useRoute()
+// console.log(route.params.dictId)
 
 const loading = ref(false)
 // 表格数据
-const tableData = ref<DictTypeForm[]>([])
+const tableData = ref<DictDataForm[]>([])
 // 表单数据
-const formData = ref<Partial<DictTypeForm>>(cloneDeep({}))
+const formData = ref<Partial<DictDataForm>>(cloneDeep({}))
 // 数据弹窗
 const dataDialogVisible = ref<boolean>(false)
 // 数据弹窗的数据是否可编辑
@@ -28,27 +34,28 @@ const isDataDialogEditable = ref<boolean>(true)
 // 分页
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 
+// 保存初始的字典类型, 防止重置时清空
+const defaultDictType = ref("")
+
 // #region 搜索栏
+// 搜索
 const searchData = reactive({
   dictName: "",
   dictType: "",
-  params: {
-    beginTime: "",
-    endTime: ""
-  }
-} as DictTypeQuery)
+  dictLabel: ""
+} as DictDataQuery)
 const searchFormRef = ref<FormInstance | null>(null)
 
-const dateRange = ref<[DateModelType, DateModelType]>(["", ""])
-watch(dateRange, ([newBeginTime, newEndTime]) => {
-  searchData.params = {}
-  searchData.params.beginTime = newBeginTime.toLocaleString()
-  searchData.params.endTime = newEndTime.toLocaleString()
-})
-
+const typeOptions = ref<DictTypeVO[]>([])
+/**
+ * 查询字典类型列表
+ */
+async function getTypeList() {
+  const res = await getSysDictOptionSelectApi()
+  typeOptions.value = res.data
+}
 function resetSearch() {
   searchFormRef.value?.resetFields()
-  dateRange.value = ["", ""]
   getTableData()
 }
 // #endregion
@@ -60,7 +67,12 @@ function resetSearch() {
 async function getTableData(): Promise<void> {
   try {
     loading.value = true
-    const { rows, total } = await getSysDictListTypeApi({
+    // 获取对应字典数据
+    const { data } = await getSysDictTypeApi(route.params && (route.params.dictId as string))
+    searchData.dictType = data.dictType
+    defaultDictType.value = data.dictType
+
+    const { rows, total } = await getSysDictDataListApi({
       ...searchData,
       pageNum: paginationData.currentPage,
       pageSize: paginationData.pageSize
@@ -69,6 +81,8 @@ async function getTableData(): Promise<void> {
     paginationData.total = total
   } catch {
     tableData.value = []
+    searchData.dictType = ""
+    defaultDictType.value = ""
   } finally {
     loading.value = false
   }
@@ -77,12 +91,12 @@ async function getTableData(): Promise<void> {
 /**
  * 删除
  */
-async function handleDelete(row: DictTypeForm | DictTypeForm[]) {
+async function handleDelete(row: DictDataForm | DictDataForm[]) {
   const items = Array.isArray(row) ? row : [row]
-  const deleteIds = items.map(item => item.dictId)
+  const deleteIds = items.map(item => item.dictCode)
   const message = Array.isArray(row)
     ? `正在删除 ${row.length} 条数据，确认删除？`
-    : `正在删除：${row.dictName}，确认删除？`
+    : `正在删除：${row.dictLabel}，确认删除？`
 
   try {
     await ElMessageBox.confirm(message, "提示", {
@@ -91,7 +105,7 @@ async function handleDelete(row: DictTypeForm | DictTypeForm[]) {
       type: "warning"
     })
     loading.value = true
-    const res = await delSysDictTypeApi(deleteIds)
+    const res = await delSysDictDataApi(deleteIds)
     ElMessage.success(res.msg)
     await getTableData()
   } catch {
@@ -106,9 +120,9 @@ async function handleDelete(row: DictTypeForm | DictTypeForm[]) {
 function handleExport() {
   const timestamp = new Date().getTime()
   download(
-    "/system/dict/type/export",
+    "/system/dict/data/export",
     { ...searchData },
-    `dict_${timestamp}.xlsx`
+    `dict_data_${timestamp}.xlsx`
   )
 }
 
@@ -116,7 +130,7 @@ function handleExport() {
  * 打开添加弹窗
  */
 function openAddDialog() {
-  formData.value = cloneDeep({})
+  formData.value = cloneDeep({ dictType: defaultDictType.value, dictSort: 0 })
   isDataDialogEditable.value = true
   dataDialogVisible.value = true
 }
@@ -126,7 +140,7 @@ function openAddDialog() {
  *
  * @param row
  */
-function openUpdateDialog(row: DictTypeForm) {
+function openUpdateDialog(row: DictDataForm) {
   formData.value = cloneDeep(row)
   isDataDialogEditable.value = true
   dataDialogVisible.value = true
@@ -137,7 +151,7 @@ function openUpdateDialog(row: DictTypeForm) {
  *
  * @param row
  */
-function openShowDialog(row: DictTypeForm) {
+function openShowDialog(row: DictDataForm) {
   formData.value = cloneDeep(row)
   isDataDialogEditable.value = false
   dataDialogVisible.value = true
@@ -166,32 +180,26 @@ watch(dataDialogVisible, (visible) => {
 })
 // #endregion
 
-onMounted(() => {
-  getTableData()
+onMounted(async () => {
+  await getTypeList()
+  await getTableData()
 })
 </script>
 
 <template>
   <div class="app-container">
     <!-- 查询表单 -->
+    <!-- <DictSearchForm v-model:loading="loading" v-model:search-data="searchData" @get-table-data="getTableData" /> -->
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
-        <el-form-item prop="dictName" label="字典名称">
-          <el-input v-model="searchData.dictName" placeholder="请输入字典名称" @keyup.enter="getTableData" />
+        <el-form-item prop="dictType" label="字典名称">
+          <el-select v-model="searchData.dictType" size="default" filterable>
+            <el-option v-for="item in typeOptions" :key="item.dictId" :label="item.dictName" :value="item.dictType" />
+          </el-select>
         </el-form-item>
-        <el-form-item prop="dictType" label="字典类型">
-          <el-input v-model="searchData.dictType" placeholder="请输入字典类型" @keyup.enter="getTableData" />
-        </el-form-item>
-        <el-form-item label="创建时间" style="width: 308px">
-          <el-date-picker
-            v-model="dateRange"
-            value-format="YYYY-MM-DD HH:mm:ss"
-            type="daterange"
-            range-separator="-"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 1, 1, 23, 59, 59)]"
-          />
+
+        <el-form-item prop="dictLabel" label="字典标签">
+          <el-input v-model="searchData.dictLabel" placeholder="请输入字典标签" @keyup.enter="getTableData" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="getTableData">
@@ -263,4 +271,10 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+.search-wrapper {
+  margin-bottom: 20px;
+  :deep(.el-card__body) {
+    padding-bottom: 2px;
+  }
+}
 </style>

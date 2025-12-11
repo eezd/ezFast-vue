@@ -11,7 +11,7 @@ export function getSysDictDataApi(dictType: string) {
 
 // 查询字典数据列表
 export function getSysDictDataListApi(query: DictDataQuery) {
-  return request<ApiResponseData<DictDataVO[]>>({
+  return request<ApiResponsePageData<DictDataVO[]>>({
     url: "/system/dict/data/list",
     method: "get",
     params: query

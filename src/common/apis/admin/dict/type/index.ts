@@ -3,7 +3,7 @@ import { request } from "@/http/axios"
 
 // 查询字典类型列表
 export function getSysDictListTypeApi(query: DictTypeQuery) {
-  return request<ApiResponseListData<DictTypeVO[]>>({
+  return request<ApiResponsePageData<DictTypeVO[]>>({
     url: "/system/dict/type/list",
     method: "get",
     params: query

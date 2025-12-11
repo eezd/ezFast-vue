@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { PaginationData } from "@@/composables/usePagination"
-import type { DictTypeForm, DictTypeQuery } from "@/common/apis/admin/dict/type/types"
+import type { DictDataForm } from "@/common/apis/admin/dict/data/types"
+import type { DictTypeQuery } from "@/common/apis/admin/dict/type/types"
 import { useDevice } from "@@/composables/useDevice"
 import { formatDateTime } from "@@/utils/index"
 import { CirclePlus, RefreshRight } from "@element-plus/icons-vue"
@@ -11,7 +12,7 @@ const emit = defineEmits<EmitEvents>()
  * defineModel
  */
 // #region defineModel
-const tableData = defineModel<DictTypeForm[]>("tableData", { required: true })
+const tableData = defineModel<DictDataForm[]>("tableData", { required: true })
 const paginationData = defineModel<PaginationData>("paginationData", { required: true })
 const loading = defineModel<boolean>("loading", { required: true })
 // #endregion
@@ -22,14 +23,14 @@ const loading = defineModel<boolean>("loading", { required: true })
 // #region EmitEvents
 export interface EmitEvents {
   openAddDialog: []
-  handleDelete: [rows: DictTypeForm[]]
+  handleDelete: [rows: DictDataForm[]]
   handleExport: []
   handleSizeChange: [val: number]
   handleCurrentChange: [val: number]
   getTableData: [params?: DictTypeQuery]
 }
 const openAddDialog = () => emit("openAddDialog")
-const handleDelete = (rows: DictTypeForm[]) => emit("handleDelete", rows)
+const handleDelete = (rows: DictDataForm[]) => emit("handleDelete", rows)
 const handleExport = () => emit("handleExport")
 const handleSizeChange = (val: number) => emit("handleSizeChange", val)
 const handleCurrentChange = (val: number) => emit("handleCurrentChange", val)
@@ -38,9 +39,9 @@ const getTableData = () => emit("getTableData")
 
 const { isMobile } = useDevice()
 
-const selectedRows = ref<DictTypeForm[]>([])
+const selectedRows = ref<DictDataForm[]>([])
 
-const handleSelectionChange = (val: DictTypeForm[]) => (selectedRows.value = val)
+const handleSelectionChange = (val: DictDataForm[]) => (selectedRows.value = val)
 </script>
 
 <template>
@@ -76,14 +77,23 @@ const handleSelectionChange = (val: DictTypeForm[]) => (selectedRows.value = val
     <div class="table-wrapper">
       <el-table :data="tableData" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="50" align="center" />
-        <el-table-column prop="dictName" label="字典名称" align="center" />
-        <el-table-column label="字典类型" align="center">
+        <el-table-column prop="dictCode" label="字典编码" align="center" />
+        <el-table-column prop="dictLabel" label="字典标签" align="center">
           <template #default="scope">
-            <router-link :to="`/admin/dict-data/${scope.row.dictId}`" class="link-type">
-              <span>{{ scope.row.dictType }}</span>
-            </router-link>
+            <span
+              v-if="(scope.row.listClass === '' || scope.row.listClass === 'default') && (scope.row.cssClass === '' || scope.row.cssClass == null)"
+            >{{ scope.row.dictLabel }}</span>
+            <el-tag
+              v-else
+              :type="scope.row.listClass === 'primary' || scope.row.listClass === 'default' ? 'primary' : scope.row.listClass"
+              :class="scope.row.cssClass"
+            >
+              {{ scope.row.dictLabel }}
+            </el-tag>
           </template>
         </el-table-column>
+        <el-table-column prop="dictValue" label="字典键值" align="center" />
+        <el-table-column prop="dictSort" label="字典排序" align="center" />
         <el-table-column prop="remark" label="备注" align="center" />
         <el-table-column label="创建时间" align="center" prop="createTime" width="180">
           <template #default="scope">

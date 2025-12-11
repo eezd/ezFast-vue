@@ -71,10 +71,19 @@ export const constantRoutes: RouteRecordRaw[] = [
       {
         path: "dict",
         component: () => import("@/pages/admin/dict/index.vue"),
-        name: "Dict",
+        name: "AdminSysDict",
         meta: {
           title: "字典管理",
           svgIcon: "dashboard"
+        }
+      },
+      {
+        path: "dict-data/:dictId",
+        component: () => import("@/pages/admin/dict/data/index.vue"),
+        name: "AdminSysDictData",
+        meta: {
+          title: "字典数据",
+          hidden: true
         }
       }
     ]
