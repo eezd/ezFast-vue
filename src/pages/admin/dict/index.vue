@@ -152,18 +152,8 @@ watch(
   [() => paginationData.currentPage, () => paginationData.pageSize],
   () => {
     getTableData()
-  },
-  { immediate: true }
-)
-
-/**
- * 弹窗关闭后刷新表格
- */
-watch(dataDialogVisible, (visible) => {
-  if (!visible) {
-    getTableData()
   }
-})
+)
 // #endregion
 
 onMounted(() => {
@@ -210,6 +200,7 @@ onMounted(() => {
       v-model:table-data="tableData"
       v-model:pagination-data="paginationData"
       @open-add-dialog="openAddDialog"
+      @get-table-data="getTableData"
       @handle-delete="handleDelete"
       @handle-export="handleExport"
       @handle-current-change="handleCurrentChange"
@@ -263,4 +254,10 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+.search-wrapper {
+  margin-bottom: 20px;
+  :deep(.el-card__body) {
+    padding-bottom: 2px;
+  }
+}
 </style>

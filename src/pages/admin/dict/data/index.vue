@@ -67,7 +67,6 @@ function resetSearch() {
 async function getTableData(): Promise<void> {
   try {
     loading.value = true
-    // 获取对应字典数据
     const { data } = await getSysDictTypeApi(route.params && (route.params.dictId as string))
     searchData.dictType = data.dictType
     defaultDictType.value = data.dictType
@@ -166,18 +165,8 @@ watch(
   [() => paginationData.currentPage, () => paginationData.pageSize],
   () => {
     getTableData()
-  },
-  { immediate: true }
-)
-
-/**
- * 弹窗关闭后刷新表格
- */
-watch(dataDialogVisible, (visible) => {
-  if (!visible) {
-    getTableData()
   }
-})
+)
 // #endregion
 
 onMounted(async () => {
@@ -189,7 +178,6 @@ onMounted(async () => {
 <template>
   <div class="app-container">
     <!-- 查询表单 -->
-    <!-- <DictSearchForm v-model:loading="loading" v-model:search-data="searchData" @get-table-data="getTableData" /> -->
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
         <el-form-item prop="dictType" label="字典名称">
@@ -218,6 +206,7 @@ onMounted(async () => {
       v-model:table-data="tableData"
       v-model:pagination-data="paginationData"
       @open-add-dialog="openAddDialog"
+      @get-table-data="getTableData"
       @handle-delete="handleDelete"
       @handle-export="handleExport"
       @handle-current-change="handleCurrentChange"

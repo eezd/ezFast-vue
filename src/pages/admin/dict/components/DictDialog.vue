@@ -7,6 +7,8 @@ import { cloneDeep } from "lodash-es"
 import { computed, ref } from "vue"
 import { addSysDictTypeApi, updateSysDictTypeApi } from "@/common/apis/admin/dict/type"
 
+const emit = defineEmits<EmitEvents>()
+
 /**
  * defineModel
  */
@@ -20,6 +22,16 @@ const formData = defineModel<Partial<DictTypeForm>>(
     required: true
   }
 )
+// #endregion
+
+/**
+ * EmitEvents
+ */
+// #region EmitEvents
+export interface EmitEvents {
+  getTableData: []
+}
+const getTableData = () => emit("getTableData")
 // #endregion
 
 const title = computed(() => {
@@ -67,6 +79,8 @@ function handleCreateOrUpdate() {
           ElMessage.success("操作成功")
         }
       } finally {
+        // 新增/修改操作后刷新表格
+        await getTableData()
         dialogVisible.value = false
         loading.value = false
       }

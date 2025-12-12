@@ -7,6 +7,8 @@ import { cloneDeep } from "lodash-es"
 import { computed, ref } from "vue"
 import { addSysDictDataApi, updateSysDictDataApi } from "@/common/apis/admin/dict/data"
 
+const emit = defineEmits<EmitEvents>()
+
 /**
  * defineModel
  */
@@ -22,9 +24,19 @@ const formData = defineModel<Partial<DictDataForm>>(
 )
 // #endregion
 
+/**
+ * EmitEvents
+ */
+// #region EmitEvents
+export interface EmitEvents {
+  getTableData: []
+}
+const getTableData = () => emit("getTableData")
+// #endregion
+
 const title = computed(() => {
-  if (!isEditable.value) return "查看字典"
-  return formData.value.dictCode === undefined ? "新增字典" : "编辑字典"
+  if (!isEditable.value) return "查看字典数据"
+  return formData.value.dictCode === undefined ? "新增字典数据" : "编辑字典数据"
 })
 
 const { isMobile } = useDevice()
@@ -81,9 +93,10 @@ function handleCreateOrUpdate() {
         } else {
           const res = await updateSysDictDataApi(formData.value as DictDataForm)
           ElMessage.success(res.msg)
-          ElMessage.success("操作成功")
         }
       } finally {
+        // 新增/修改操作后刷新表格
+        await getTableData()
         dialogVisible.value = false
         loading.value = false
       }
