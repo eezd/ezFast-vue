@@ -38,7 +38,9 @@ export default antfu(
       "symbol-description": "off",
       "antfu/if-newline": "off",
 
-      "no-unused-vars": "warn"
+      "no-unused-vars": ["warn"],
+      "vue/no-unused-vars": ["warn"],
+      "unused-imports/no-unused-vars": ["warn"]
     }
   }
 )

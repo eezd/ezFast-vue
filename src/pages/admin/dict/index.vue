@@ -249,6 +249,7 @@ onMounted(() => {
       v-model:data-dialog-visible="dataDialogVisible"
       v-model:is-editable="isDataDialogEditable"
       v-model:form-data="formData"
+      @get-table-data="getTableData"
     />
   </div>
 </template>

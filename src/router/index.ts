@@ -82,7 +82,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
         name: "AdminSysDict",
         meta: {
           title: "字典管理",
-          svgIcon: "dashboard"
+          svgIcon: "dict"
         }
       },
       {
@@ -92,6 +92,15 @@ export const dynamicRoutes: RouteRecordRaw[] = [
         meta: {
           title: "字典数据",
           hidden: true
+        }
+      },
+      {
+        path: "menu",
+        component: () => import("@/pages/admin/menu/index.vue"),
+        name: "AdminSysMenu",
+        meta: {
+          title: "菜单权限管理",
+          svgIcon: "tree-table"
         }
       }
     ]
