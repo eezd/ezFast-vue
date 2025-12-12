@@ -28,7 +28,11 @@ const settingsStore = useSettingsStore()
 
 const activeMenu = computed(() => route.meta.activeMenu || route.path)
 
-const noHiddenRoutes = computed(() => permissionStore.routes.filter(item => !item.meta?.hidden))
+const noHiddenRoutes = computed(() =>
+  permissionStore.routes.filter(item =>
+    !item.meta?.hidden && item.path.startsWith("/admin")
+  )
+)
 
 const isCollapse = computed(() => !appStore.sidebar.opened)
 

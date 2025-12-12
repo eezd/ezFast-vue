@@ -49,7 +49,15 @@ export const constantRoutes: RouteRecordRaw[] = [
     meta: {
       hidden: true
     }
-  },
+  }
+]
+
+/**
+ * @name 动态路由
+ * @description 用来放置有权限 (Roles 属性) 的路由
+ * @description 必须带有唯一的 Name 属性
+ */
+export const dynamicRoutes: RouteRecordRaw[] = [
   {
     path: "/admin",
     component: Layouts,
@@ -88,14 +96,6 @@ export const constantRoutes: RouteRecordRaw[] = [
       }
     ]
   }
-]
-
-/**
- * @name 动态路由
- * @description 用来放置有权限 (Roles 属性) 的路由
- * @description 必须带有唯一的 Name 属性
- */
-export const dynamicRoutes: RouteRecordRaw[] = [
 ]
 
 /** 路由实例 */
