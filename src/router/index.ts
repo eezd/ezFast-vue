@@ -110,6 +110,15 @@ export const dynamicRoutes: RouteRecordRaw[] = [
               title: "菜单权限管理",
               svgIcon: "tree-table"
             }
+          },
+          {
+            path: "config",
+            component: () => import("@/pages/admin/config/index.vue"),
+            name: "AdminSysConfig",
+            meta: {
+              title: "参数设置",
+              svgIcon: "edit"
+            }
           }
         ]
       }
