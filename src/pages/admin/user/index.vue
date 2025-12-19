@@ -48,8 +48,8 @@ const searchData = reactive({
   status: "",
   roleId: "",
   params: {
-    beginTime: "",
-    endTime: ""
+    beginTime: undefined,
+    endTime: undefined
   }
 } as UserQuery)
 const searchFormRef = ref<FormInstance | null>(null)
@@ -121,9 +121,9 @@ async function handleDelete(row: UserForm | UserForm[]) {
 function handleExport() {
   const timestamp = new Date().getTime()
   download(
-    "/system/User/type/export",
+    "/system/user/export",
     { ...searchData },
-    `User_${timestamp}.xlsx`
+    `user_${timestamp}.xlsx`
   )
 }
 
@@ -193,7 +193,7 @@ async function handleResetPwd(row: UserVO) {
         if (/[<>"'|\\]/.test(value)) {
           return "不能包含非法字符：< > \" ' \\ |"
         }
-        return true // 需要返回一个布尔值或者字符串
+        return true
       }
     })
     await resetSysUserPwdApi(row.userId, value)

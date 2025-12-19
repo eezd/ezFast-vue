@@ -44,8 +44,8 @@ const searchData = reactive({
   roleKey: "",
   status: "",
   params: {
-    beginTime: "",
-    endTime: ""
+    beginTime: undefined,
+    endTime: undefined
   }
 } as RoleQuery)
 const searchFormRef = ref<FormInstance | null>(null)

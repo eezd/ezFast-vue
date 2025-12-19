@@ -37,8 +37,8 @@ const searchData = reactive({
   configKey: "",
   configType: "",
   params: {
-    beginTime: "",
-    endTime: ""
+    beginTime: undefined,
+    endTime: undefined
   }
 } as ConfigQuery)
 const searchFormRef = ref<FormInstance | null>(null)

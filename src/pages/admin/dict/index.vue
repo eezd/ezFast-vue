@@ -33,8 +33,8 @@ const searchData = reactive({
   dictName: "",
   dictType: "",
   params: {
-    beginTime: "",
-    endTime: ""
+    beginTime: undefined,
+    endTime: undefined
   }
 } as DictTypeQuery)
 const searchFormRef = ref<FormInstance | null>(null)
