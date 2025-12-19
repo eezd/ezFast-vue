@@ -55,7 +55,36 @@ const formRules: FormRules<UserForm> = {
       trigger: "blur",
       message: "用户名称必填"
     }
-  ]
+  ],
+  nickName: [
+    {
+      required: true,
+      trigger: "blur",
+      message: "用户昵称必填"
+    }
+  ],
+  roleIds: [
+    {
+      required: true,
+      trigger: "blur",
+      message: "角色必填"
+    }
+  ],
+  password: formData.value.userId === undefined
+    ? [
+        {
+          required: true,
+          trigger: "blur",
+          message: "密码必填"
+        },
+        {
+          min: 5,
+          max: 20,
+          message: "密码长度必须 5 到 20 位",
+          trigger: "blur"
+        }
+      ]
+    : []
 }
 
 /**
@@ -76,7 +105,6 @@ function handleCreateOrUpdate() {
           ElMessage.success(res.msg)
         }
       } finally {
-        // 新增/修改操作后刷新表格
         await getTableData()
         dialogVisible.value = false
         loading.value = false
@@ -110,17 +138,14 @@ function resetForm() {
       <el-form-item prop="email" label="邮箱">
         <ElInput v-model="formData.email" placeholder="请输入邮箱" :disabled="!isEditable" />
       </el-form-item>
-
       <el-form-item prop="sex" label="性别">
         <el-select v-model="formData.sex" placeholder="请选择" :disabled="!isEditable">
           <el-option v-for="dict in sys_user_sex" :key="dict.value" :label="dict.label" :value="dict.value" />
         </el-select>
       </el-form-item>
-
       <el-form-item prop="password" label="用户密码" v-if="formData.userId === undefined">
         <ElInput v-model="formData.password" placeholder="请输入用户密码" type="password" maxlength="40" show-password :disabled="!isEditable" />
       </el-form-item>
-
       <el-form-item prop="status" label="状态">
         <el-radio-group v-model="formData.status" :disabled="!isEditable">
           <el-radio v-for="dict in sys_normal_disable" :key="dict.value" :value="dict.value">
@@ -128,9 +153,8 @@ function resetForm() {
           </el-radio>
         </el-radio-group>
       </el-form-item>
-
-      <el-form-item prop="roleIds" label="用户">
-        <el-select v-model="formData.roleIds" filterable multiple placeholder="请选择用户" :disabled="!isEditable">
+      <el-form-item prop="roleIds" label="角色">
+        <el-select v-model="formData.roleIds" filterable multiple placeholder="请选择角色" :disabled="!isEditable">
           <el-option
             v-for="item in roleOptions"
             :key="item.roleId"
@@ -140,7 +164,6 @@ function resetForm() {
           />
         </el-select>
       </el-form-item>
-
       <el-form-item prop="remark" label="备注">
         <ElInput v-model="formData.remark" type="textarea" placeholder="请输入备注" :disabled="!isEditable" />
       </el-form-item>

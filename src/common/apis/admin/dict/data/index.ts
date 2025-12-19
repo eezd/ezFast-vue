@@ -19,7 +19,7 @@ export function getSysDictDataListApi(query: DictDataQuery) {
 }
 
 // 查询字典数据详细
-export function getDataApi(dictCode: string | number) {
+export function getSysDictDataCodeApi(dictCode: string | number) {
   return request<ApiResponseData<DictDataVO>>({
     url: `/system/dict/data/${dictCode}`,
     method: "get"

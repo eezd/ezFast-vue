@@ -56,6 +56,7 @@ const handleSelectionChange = (val: DictTypeForm[]) => (selectedRows.value = val
         </el-button>
         <el-button
           type="danger" plain icon="Delete"
+          :disabled="!selectedRows.length"
           @click="handleDelete(selectedRows)"
         >
           批量删除

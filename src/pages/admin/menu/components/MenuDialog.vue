@@ -109,7 +109,7 @@ function resetForm() {
 
 <template>
   <el-dialog v-model="dialogVisible" :title="title" @closed="resetForm" :width="isMobile ? '90%' : '50%'">
-    <el-form ref="formRef" label-width="100px" :model="formData" :rules="formRules" label-position="left">
+    <el-form ref="formRef" v-loading="loading" label-width="100px" :model="formData" :rules="formRules" label-position="left">
       <el-row>
         <el-col :span="24">
           <el-form-item label="上级菜单">

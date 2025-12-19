@@ -6,7 +6,7 @@ import { Delete, Refresh, Search } from "@element-plus/icons-vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { cloneDeep } from "lodash-es"
 import { ref, watch } from "vue"
-import { delSysDictTypeApi, getSysDictListTypeApi } from "@/common/apis/admin/dict/type"
+import { delSysDictTypeApi, getSysDictListTypeApi, getSysDictTypeApi } from "@/common/apis/admin/dict/type"
 import { download } from "@/common/utils/test"
 import DictDataDialog from "./components/DictDialog.vue"
 import DictTable from "./components/DictTable.vue"
@@ -23,7 +23,7 @@ const formData = ref<Partial<DictTypeForm>>(cloneDeep({}))
 // 数据弹窗
 const dataDialogVisible = ref<boolean>(false)
 // 数据弹窗的数据是否可编辑
-const isDataDialogEditable = ref<boolean>(true)
+const isEditableInDataDialog = ref<boolean>(true)
 
 // 分页
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
@@ -113,11 +113,11 @@ function handleExport() {
 }
 
 /**
- * 打开添加弹窗
+ * 打开新增弹窗
  */
 function openAddDialog() {
   formData.value = cloneDeep({})
-  isDataDialogEditable.value = true
+  isEditableInDataDialog.value = true
   dataDialogVisible.value = true
 }
 
@@ -126,10 +126,17 @@ function openAddDialog() {
  *
  * @param row
  */
-function openUpdateDialog(row: DictTypeForm) {
-  formData.value = cloneDeep(row)
-  isDataDialogEditable.value = true
+async function openUpdateDialog(row: DictTypeForm) {
+  loading.value = true
+  isEditableInDataDialog.value = true
   dataDialogVisible.value = true
+  try {
+    formData.value = cloneDeep({})
+    const { data } = await getSysDictTypeApi(row.dictId)
+    formData.value = data as DictTypeForm
+  } finally {
+    loading.value = false
+  }
 }
 
 /**
@@ -137,10 +144,17 @@ function openUpdateDialog(row: DictTypeForm) {
  *
  * @param row
  */
-function openShowDialog(row: DictTypeForm) {
-  formData.value = cloneDeep(row)
-  isDataDialogEditable.value = false
+async function openShowDialog(row: DictTypeForm) {
+  loading.value = true
+  isEditableInDataDialog.value = false
   dataDialogVisible.value = true
+  try {
+    formData.value = cloneDeep({})
+    const { data } = await getSysDictTypeApi(row.dictId)
+    formData.value = data as DictTypeForm
+  } finally {
+    loading.value = false
+  }
 }
 // #endregion
 
@@ -248,7 +262,7 @@ onMounted(async () => {
     <DictDataDialog
       v-model:loading="loading"
       v-model:data-dialog-visible="dataDialogVisible"
-      v-model:is-editable="isDataDialogEditable"
+      v-model:is-editable="isEditableInDataDialog"
       v-model:form-data="formData"
       @get-table-data="getTableData"
     />

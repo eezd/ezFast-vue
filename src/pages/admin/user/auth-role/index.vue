@@ -26,10 +26,10 @@ const tableRef = ref<InstanceType<typeof ElTable> | null>(null)
 const allRoles = ref<RoleVO[]>([])
 // 当前页显示的数据
 const tableData = ref<RoleVO[]>([])
-// 表单数据
+// 表单数据 保存用户信息
 const formData = ref<Partial<UserForm>>(cloneDeep({}))
 
-// 核心：使用 Set 维护所有选中的 RoleID (跨页面的唯一真理)
+// 核心：使用 Set 维护所有选中的 RoleID
 const roleIds = ref<Set<string | number>>(new Set())
 
 // 分页
@@ -37,7 +37,6 @@ const { paginationData, handleCurrentChange, handleSizeChange } = usePagination(
 
 /** 获取 Row Key */
 function getRowKey(row: RoleVO) {
-  // 核心修复：使用 String() 强制转为字符串
   return String(row.roleId)
 }
 /** 检查行是否可选 */
@@ -45,14 +44,9 @@ function checkSelectable(row: RoleVO): boolean {
   return row.status === "0" // 只有状态为0的才可选
 }
 
-/**
- * 单击行：既改变数据，又改变UI
- */
 function clickRow(row: RoleVO) {
   if (!checkSelectable(row)) return
-
   const isSelected = roleIds.value.has(row.roleId)
-
   if (isSelected) {
     roleIds.value.delete(row.roleId)
   } else {
@@ -69,9 +63,7 @@ function clickRow(row: RoleVO) {
  */
 function handleSelect(selection: RoleVO[], row: RoleVO) {
   // 判断当前点击的行是在选中数组中(选中操作)，还是不在(取消操作)
-  // 注意：element-plus 的 selection 包含当前页所有选中的行
   const isChecked = selection.some(item => item.roleId === row.roleId)
-
   if (isChecked) {
     roleIds.value.add(row.roleId)
   } else {
@@ -84,8 +76,6 @@ function handleSelect(selection: RoleVO[], row: RoleVO) {
  */
 function handleSelectAll(selection: RoleVO[]) {
   const isAllSelected = selection.length > 0
-
-  // 遍历当前页的数据 tableData 进行批量操作
   tableData.value.forEach((row) => {
     if (!checkSelectable(row)) return
 
@@ -169,7 +159,6 @@ async function handlePagination() {
   })
 }
 
-// 监听分页变化
 watch(
   [() => paginationData.currentPage, () => paginationData.pageSize],
   () => {

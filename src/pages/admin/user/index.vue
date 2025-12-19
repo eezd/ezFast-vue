@@ -33,7 +33,7 @@ const formData = ref<Partial<UserForm>>(cloneDeep(DEFAULT_FORM_DATA))
 // 数据弹窗
 const dataDialogVisible = ref<boolean>(false)
 // 数据弹窗的数据是否可编辑
-const isDataDialogEditable = ref<boolean>(true)
+const isEditableInDataDialog = ref<boolean>(true)
 
 const roleOptions = ref<RoleVO[]>([])
 const initPassword = ref<string>("")
@@ -128,18 +128,20 @@ function handleExport() {
 }
 
 /**
- * 打开添加弹窗
+ * 打开新增弹窗
  */
 async function openAddDialog() {
-  formData.value = cloneDeep({})
-
-  const { data } = await getSysUserApi()
-  roleOptions.value = data.roles
-  formData.value.password = initPassword.value.toString()
-
-  isDataDialogEditable.value = true
+  loading.value = true
+  isEditableInDataDialog.value = true
   dataDialogVisible.value = true
-  loading.value = false
+  try {
+    formData.value = cloneDeep({})
+    const { data } = await getSysUserApi()
+    roleOptions.value = data.roles
+    formData.value.password = initPassword.value.toString()
+  } finally {
+    loading.value = false
+  }
 }
 
 /**
@@ -147,18 +149,21 @@ async function openAddDialog() {
  */
 async function openUpdateDialog(row: UserForm) {
   loading.value = true
-  isDataDialogEditable.value = true
+  isEditableInDataDialog.value = true
   dataDialogVisible.value = true
-  formData.value = cloneDeep({})
-  const userId = row?.userId
-  const { data } = await getSysUserApi(userId)
-  Object.assign(formData.value, data.user)
-  roleOptions.value = Array.from(
-    new Map([...data.roles, ...data.user.roles].map(role => [role.roleId, role])).values()
-  )
-  formData.value.roleIds = data.roleIds
-  formData.value.password = ""
-  loading.value = false
+  try {
+    formData.value = cloneDeep({})
+    const userId = row?.userId
+    const { data } = await getSysUserApi(userId)
+    Object.assign(formData.value, data.user)
+    roleOptions.value = Array.from(
+      new Map([...data.roles, ...data.user.roles].map(role => [role.roleId, role])).values()
+    )
+    formData.value.roleIds = data.roleIds
+    formData.value.password = ""
+  } finally {
+    loading.value = false
+  }
 }
 
 /**
@@ -166,18 +171,21 @@ async function openUpdateDialog(row: UserForm) {
  */
 async function openShowDialog(row: UserForm) {
   loading.value = true
-  isDataDialogEditable.value = false
+  isEditableInDataDialog.value = false
   dataDialogVisible.value = true
-  formData.value = cloneDeep({})
-  const userId = row?.userId
-  const { data } = await getSysUserApi(userId)
-  Object.assign(formData.value, data.user)
-  roleOptions.value = Array.from(
-    new Map([...data.roles, ...data.user.roles].map(role => [role.roleId, role])).values()
-  )
-  formData.value.roleIds = data.roleIds
-  formData.value.password = ""
-  loading.value = false
+  try {
+    formData.value = cloneDeep({})
+    const userId = row?.userId
+    const { data } = await getSysUserApi(userId)
+    Object.assign(formData.value, data.user)
+    roleOptions.value = Array.from(
+      new Map([...data.roles, ...data.user.roles].map(role => [role.roleId, role])).values()
+    )
+    formData.value.roleIds = data.roleIds
+    formData.value.password = ""
+  } finally {
+    loading.value = false
+  }
 }
 
 /** 重置密码按钮操作 */
@@ -338,7 +346,7 @@ onMounted(async () => {
     <UserDialog
       v-model:loading="loading"
       v-model:data-dialog-visible="dataDialogVisible"
-      v-model:is-editable="isDataDialogEditable"
+      v-model:is-editable="isEditableInDataDialog"
       v-model:form-data="formData"
       v-model:role-options="roleOptions"
       @get-table-data="getTableData"

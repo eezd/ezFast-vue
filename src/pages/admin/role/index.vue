@@ -30,7 +30,7 @@ const formData = ref<Partial<RoleForm>>(cloneDeep(DEFAULT_FORM_DATA))
 // 数据弹窗
 const dataDialogVisible = ref<boolean>(false)
 // 数据弹窗的数据是否可编辑
-const isDataDialogEditable = ref<boolean>(true)
+const isEditableInDataDialog = ref<boolean>(true)
 
 const menuRef = ref<ElTreeInstance | null>(null)
 const menuOptions = ref<MenuTreeOption[]>([])
@@ -124,11 +124,11 @@ function handleExport() {
 }
 
 /**
- * 打开添加弹窗
+ * 打开新增弹窗
  */
 function openAddDialog() {
   formData.value = cloneDeep(DEFAULT_FORM_DATA)
-  isDataDialogEditable.value = true
+  isEditableInDataDialog.value = true
   dataDialogVisible.value = true
 }
 
@@ -142,7 +142,7 @@ async function openUpdateDialog(row: RoleForm) {
   const { data } = await getSysRoleApi(roleId)
   Object.assign(formData.value, data)
   formData.value.roleSort = Number(formData.value.roleSort)
-  isDataDialogEditable.value = true
+  isEditableInDataDialog.value = true
   dataDialogVisible.value = true
 }
 
@@ -152,7 +152,7 @@ async function openUpdateDialog(row: RoleForm) {
 async function openShowDialog(row: RoleForm) {
   loading.value = true
   formData.value = cloneDeep(row)
-  isDataDialogEditable.value = false
+  isEditableInDataDialog.value = false
   dataDialogVisible.value = true
 }
 // #endregion
@@ -273,7 +273,7 @@ onMounted(async () => {
       v-model:menu-ref="menuRef"
       v-model:loading="loading"
       v-model:data-dialog-visible="dataDialogVisible"
-      v-model:is-editable="isDataDialogEditable"
+      v-model:is-editable="isEditableInDataDialog"
       v-model:form-data="formData"
       v-model:menu-options="menuOptions"
       @get-table-data="getTableData"

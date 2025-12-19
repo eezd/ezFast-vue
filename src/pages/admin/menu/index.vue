@@ -58,7 +58,7 @@ const formData = ref<Partial<MenuForm>>(cloneDeep(DEFAULT_FORM_DATA))
 // 数据弹窗
 const dataDialogVisible = ref<boolean>(false)
 // 数据弹窗的数据是否可编辑
-const isDataDialogEditable = ref<boolean>(true)
+const isEditableInDataDialog = ref<boolean>(true)
 
 // #region 搜索栏
 const searchData = reactive({
@@ -186,12 +186,13 @@ async function handleDelete(row: MenuForm) {
 }
 
 /**
- * 打开添加弹窗
+ * 打开新增弹窗
  */
 function openAddDialog() {
   formData.value = cloneDeep(DEFAULT_FORM_DATA)
-  isDataDialogEditable.value = true
+  isEditableInDataDialog.value = true
   dataDialogVisible.value = true
+  loading.value = false
 }
 
 /**
@@ -200,12 +201,16 @@ function openAddDialog() {
  * @param row
  */
 async function openUpdateDialog(row: MenuForm) {
-  if (row.menuId) {
+  loading.value = true
+  isEditableInDataDialog.value = true
+  dataDialogVisible.value = true
+  try {
+    formData.value = cloneDeep({})
     const { data } = await getSysMenuApi(row.menuId)
     formData.value = data as MenuForm
+  } finally {
+    loading.value = false
   }
-  isDataDialogEditable.value = true
-  dataDialogVisible.value = true
 }
 
 /**
@@ -214,12 +219,16 @@ async function openUpdateDialog(row: MenuForm) {
  * @param row
  */
 async function openShowDialog(row: MenuForm) {
-  if (row.menuId) {
+  loading.value = true
+  isEditableInDataDialog.value = false
+  dataDialogVisible.value = true
+  try {
+    formData.value = cloneDeep({})
     const { data } = await getSysMenuApi(row.menuId)
     formData.value = data as MenuForm
+  } finally {
+    loading.value = false
   }
-  isDataDialogEditable.value = false
-  dataDialogVisible.value = true
 }
 // #endregion
 
@@ -318,7 +327,7 @@ onMounted(async () => {
     <DictDataDialog
       v-model:loading="loading"
       v-model:data-dialog-visible="dataDialogVisible"
-      v-model:is-editable="isDataDialogEditable"
+      v-model:is-editable="isEditableInDataDialog"
       v-model:form-data="formData"
       v-model:menu-options="menuOptions"
       @get-table-data="getTableData"

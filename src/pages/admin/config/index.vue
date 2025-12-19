@@ -6,7 +6,7 @@ import { Delete, Refresh, Search } from "@element-plus/icons-vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { cloneDeep } from "lodash-es"
 import { ref, watch } from "vue"
-import { delConfigApi, getSysConfigListApi } from "@/common/apis/admin/config"
+import { delConfigApi, getSysConfigApi, getSysConfigListApi } from "@/common/apis/admin/config"
 import { useDict } from "@/common/composables/useDict"
 import { download } from "@/common/utils/test"
 import ConfigDialog from "./components/ConfigDialog.vue"
@@ -26,7 +26,7 @@ const formData = ref<Partial<ConfigForm>>(cloneDeep({}))
 // 数据弹窗
 const dataDialogVisible = ref<boolean>(false)
 // 数据弹窗的数据是否可编辑
-const isDataDialogEditable = ref<boolean>(true)
+const isEditableInDataDialog = ref<boolean>(true)
 
 // 分页
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
@@ -117,11 +117,11 @@ function handleExport() {
 }
 
 /**
- * 打开添加弹窗
+ * 打开新增弹窗
  */
 function openAddDialog() {
   formData.value = cloneDeep({})
-  isDataDialogEditable.value = true
+  isEditableInDataDialog.value = true
   dataDialogVisible.value = true
 }
 
@@ -130,10 +130,17 @@ function openAddDialog() {
  *
  * @param row
  */
-function openUpdateDialog(row: ConfigForm) {
-  formData.value = cloneDeep(row)
-  isDataDialogEditable.value = true
+async function openUpdateDialog(row: ConfigForm) {
+  loading.value = true
+  isEditableInDataDialog.value = true
   dataDialogVisible.value = true
+  try {
+    formData.value = cloneDeep({})
+    const { data } = await getSysConfigApi(row.configId)
+    formData.value = data as ConfigForm
+  } finally {
+    loading.value = false
+  }
 }
 
 /**
@@ -141,10 +148,17 @@ function openUpdateDialog(row: ConfigForm) {
  *
  * @param row
  */
-function openShowDialog(row: ConfigForm) {
-  formData.value = cloneDeep(row)
-  isDataDialogEditable.value = false
+async function openShowDialog(row: ConfigForm) {
+  loading.value = true
+  isEditableInDataDialog.value = false
   dataDialogVisible.value = true
+  try {
+    formData.value = cloneDeep({})
+    const { data } = await getSysConfigApi(row.configId)
+    formData.value = data as ConfigForm
+  } finally {
+    loading.value = false
+  }
 }
 // #endregion
 
@@ -257,7 +271,7 @@ onMounted(async () => {
     <ConfigDialog
       v-model:loading="loading"
       v-model:data-dialog-visible="dataDialogVisible"
-      v-model:is-editable="isDataDialogEditable"
+      v-model:is-editable="isEditableInDataDialog"
       v-model:form-data="formData"
       @get-table-data="getTableData"
     />

@@ -116,7 +116,7 @@ function resetForm() {
 
 <template>
   <el-dialog v-model="dialogVisible" :title="title" @closed="resetForm" :width="isMobile ? '90%' : '40%'">
-    <el-form ref="formRef" label-width="80px" :model="formData" :rules="formRules" label-position="left">
+    <el-form ref="formRef" v-loading="loading" label-width="80px" :model="formData" :rules="formRules" label-position="left">
       <el-form-item prop="dictType" label="字典类型">
         <el-input v-model="formData.dictType" placeholder="请输入字典类型" :disabled="true" />
       </el-form-item>

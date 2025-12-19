@@ -57,6 +57,7 @@ const handleSelectionChange = (val: DictDataForm[]) => (selectedRows.value = val
         <el-button
           type="danger" plain icon="Delete"
           @click="handleDelete(selectedRows)"
+          :disabled="!selectedRows.length"
         >
           批量删除
         </el-button>
