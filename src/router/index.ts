@@ -191,6 +191,15 @@ export const dynamicRoutes: RouteRecordRaw[] = [
               title: "登录日志",
               svgIcon: "logininfor"
             }
+          },
+          {
+            path: "client",
+            component: () => import("@/pages/admin/client/index.vue"),
+            name: "AdminSysClient",
+            meta: {
+              title: "客户端管理",
+              svgIcon: "international"
+            }
           }
         ]
       }
