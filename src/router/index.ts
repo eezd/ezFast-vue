@@ -88,7 +88,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
             children: [
               {
                 path: "",
-                component: () => import("@/pages/admin/user/index.vue"),
+                component: () => import("@/pages/admin/system/user/index.vue"),
                 name: "AdminSysUser",
                 meta: {
                   title: "用户管理",
@@ -97,7 +97,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
               },
               {
                 path: "auth-role/:userId",
-                component: () => import("@/pages/admin/user/auth-role/index.vue"),
+                component: () => import("@/pages/admin/system/user/auth-role/index.vue"),
                 name: "AdminSysUserAuthRole",
                 meta: {
                   title: "分配角色",
@@ -111,7 +111,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
             children: [
               {
                 path: "",
-                component: () => import("@/pages/admin/role/index.vue"),
+                component: () => import("@/pages/admin/system/role/index.vue"),
                 name: "AdminSysRole",
                 meta: {
                   title: "角色管理",
@@ -120,7 +120,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
               },
               {
                 path: "auth-user/:roleId",
-                component: () => import("@/pages/admin/role/auth-user/index.vue"),
+                component: () => import("@/pages/admin/system/role/auth-user/index.vue"),
                 name: "AdminSysRoleAuthUser",
                 meta: {
                   title: "分配用户",
@@ -131,7 +131,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
           },
           {
             path: "dict",
-            component: () => import("@/pages/admin/dict/index.vue"),
+            component: () => import("@/pages/admin/system/dict/index.vue"),
             name: "AdminSysDict",
             meta: {
               title: "字典管理",
@@ -140,7 +140,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
           },
           {
             path: "dict-data/:dictId",
-            component: () => import("@/pages/admin/dict/data/index.vue"),
+            component: () => import("@/pages/admin/system/dict/data/index.vue"),
             name: "AdminSysDictData",
             meta: {
               title: "字典数据",
@@ -149,7 +149,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
           },
           {
             path: "menu",
-            component: () => import("@/pages/admin/menu/index.vue"),
+            component: () => import("@/pages/admin/system/menu/index.vue"),
             name: "AdminSysMenu",
             meta: {
               title: "菜单权限管理",
@@ -158,7 +158,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
           },
           {
             path: "config",
-            component: () => import("@/pages/admin/config/index.vue"),
+            component: () => import("@/pages/admin/system/config/index.vue"),
             name: "AdminSysConfig",
             meta: {
               title: "参数设置",
@@ -167,7 +167,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
           },
           {
             path: "notice",
-            component: () => import("@/pages/admin/notice/index.vue"),
+            component: () => import("@/pages/admin/system/notice/index.vue"),
             name: "AdminSysNotice",
             meta: {
               title: "通知公告",
@@ -176,7 +176,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
           },
           {
             path: "operlog",
-            component: () => import("@/pages/admin/operlog/index.vue"),
+            component: () => import("@/pages/admin/system/operlog/index.vue"),
             name: "AdminSysOperLog",
             meta: {
               title: "操作日志",
@@ -185,7 +185,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
           },
           {
             path: "logininfor",
-            component: () => import("@/pages/admin/logininfor/index.vue"),
+            component: () => import("@/pages/admin/system/logininfor/index.vue"),
             name: "AdminSysLoginInfor",
             meta: {
               title: "登录日志",
@@ -194,7 +194,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
           },
           {
             path: "client",
-            component: () => import("@/pages/admin/client/index.vue"),
+            component: () => import("@/pages/admin/system/client/index.vue"),
             name: "AdminSysClient",
             meta: {
               title: "客户端管理",
