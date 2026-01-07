@@ -116,7 +116,7 @@ async function handleStatusChange(row: ClientVO) {
         <el-table-column prop="timeout" label="Token固定超时时间" align="center" :show-overflow-tooltip="true" />
         <el-table-column prop="status" label="状态" align="center">
           <template #default="scope">
-            <el-switch v-model="scope.row.status" active-value="0" inactive-value="1" @change="handleStatusChange(scope.row)" />
+            <el-switch v-model="scope.row.status" active-value="0" inactive-value="1" :disabled="!checkPermission(['system:client:edit'])" @change="handleStatusChange(scope.row)" />
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" :width="isMobile ? 100 : 130" align="center">

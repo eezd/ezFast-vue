@@ -101,7 +101,7 @@ async function handleStatusChange(row: RoleForm) {
         <el-table-column prop="roleSort" label="显示顺序" align="center" />
         <el-table-column prop="status" label="状态" align="center">
           <template #default="scope">
-            <el-switch v-model="scope.row.status" active-value="0" inactive-value="1" @change="handleStatusChange(scope.row)" />
+            <el-switch v-model="scope.row.status" active-value="0" inactive-value="1" :disabled="!checkPermission(['system:role:edit'])" @change="handleStatusChange(scope.row)" />
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="createTime" min-width="180">
