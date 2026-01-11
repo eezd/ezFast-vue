@@ -66,7 +66,7 @@ function resetForm() {
       </el-descriptions-item>
       <el-descriptions-item label="登录信息">
         <template #default>
-          {{ formData.operName }} / {{ formData.deptName }} / {{ formData.operIp }} / {{ formData.operLocation }}
+          {{ formData.operName }} / {{ formData.operIp }} / {{ formData.operLocation }}
         </template>
       </el-descriptions-item>
       <el-descriptions-item label="请求信息">

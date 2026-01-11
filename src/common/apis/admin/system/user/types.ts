@@ -65,7 +65,6 @@ export interface UserVO extends BaseEntity {
    * 帐号状态（0正常 1停用）
    */
   status: string
-  delFlag: string
   /**
    * 最后登录IP
    */
@@ -102,16 +101,49 @@ export interface UserVO extends BaseEntity {
  */
 export interface UserForm {
   id: string
+  /**
+   * 用户ID
+   */
   userId: string
+  /**
+   * 用户账号
+   */
   userName: string
+  /**
+   * 用户昵称
+   */
   nickName: string
-  password: string
+  /**
+   * 手机号码
+   */
   phonenumber: string
+  /**
+   * 用户邮箱
+   */
   email: string
+  /**
+   * 用户性别（0男 1女 2未知）
+   */
   sex: string
+  /**
+   * 密码
+   */
+  password: string
+  /**
+   * 帐号状态（0正常 1停用）
+   */
   status: string
+  /**
+   * 备注
+   */
   remark: string
+  /**
+   * 岗位组
+   */
   postIds: string[]
+  /**
+   * 数据权限 当前角色ID
+   */
   roleIds: string[]
 }
 

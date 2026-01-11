@@ -1,15 +1,6 @@
 export interface DictDataQuery extends PageQuery {
-  /**
-   * 字典名称
-   */
   dictName: string
-  /**
-   * 字典类型
-   */
   dictType: string
-  /**
-   * 字典标签
-   */
   dictLabel: string
 }
 

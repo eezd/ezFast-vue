@@ -30,10 +30,6 @@ export interface MenuQuery {
  */
 export interface MenuVO extends BaseEntity {
   /**
-   * 子菜单
-   */
-  children: MenuVO[]
-  /**
    * 菜单ID
    */
   menuId: number | string
@@ -42,66 +38,25 @@ export interface MenuVO extends BaseEntity {
    */
   menuName: string
   /**
-   * 菜单类型（M目录 C菜单 F按钮）
+   * 父菜单ID
    */
-  menuType: MenuTypeEnum
+  parentId: number
   /**
    * 显示顺序
    */
   orderNum: number
   /**
-   * 父菜单ID
+   * 菜单类型（M目录 C菜单 F按钮）
    */
-  parentId: number
-  /**
-   * 权限标识
-   */
-  perms: string
-  /**
-   * 备注
-   */
-  remark: string
-  /**
-   * 菜单状态（0正常 1停用）
-   */
-  status: string
+  menuType: MenuTypeEnum
   /**
    * 显示状态（0显示 1隐藏）
    */
   visible: string
-}
-
-export interface MenuForm {
-  // children: MenuForm[] | undefined
-
   /**
-   * 创建者
+   * 菜单状态（0正常 1停用）
    */
-  createBy?: number
-  /**
-   * 创建时间
-   */
-  createTime?: Date
-  /**
-   * 菜单ID
-   */
-  menuId: number | string
-  /**
-   * 菜单名称
-   */
-  menuName: string
-  /**
-   * 菜单类型（M目录 C菜单 F按钮）
-   */
-  menuType: MenuTypeEnum
-  /**
-   * 显示顺序
-   */
-  orderNum: number
-  /**
-   * 父菜单ID
-   */
-  parentId: number
+  status: string
   /**
    * 权限标识
    */
@@ -111,9 +66,49 @@ export interface MenuForm {
    */
   remark: string
   /**
+   * 子菜单
+   */
+  children: MenuVO[]
+}
+
+export interface MenuForm {
+  // children: MenuForm[] | undefined
+  /**
+   * 菜单ID
+   */
+  menuId: number | string
+  /**
+   * 菜单名称
+   */
+  menuName: string
+  /**
+   * 父菜单ID
+   */
+  parentId: number
+  /**
+   * 显示顺序
+   */
+  orderNum: number
+  /**
+   * 菜单类型（M目录 C菜单 F按钮）
+   */
+  menuType: MenuTypeEnum
+  /**
+   * 显示状态（0显示 1隐藏）
+   */
+  visible: string
+  /**
    * 菜单状态（0正常 1停用）
    */
   status: string
+  /**
+   * 权限标识
+   */
+  perms: string
+  /**
+   * 备注
+   */
+  remark: string
   /**
    * 更新者
    */
@@ -123,7 +118,11 @@ export interface MenuForm {
    */
   updateTime: Date
   /**
-   * 显示状态（0显示 1隐藏）
+   * 创建者
    */
-  visible: string
+  createBy?: number
+  /**
+   * 创建时间
+   */
+  createTime?: Date
 }

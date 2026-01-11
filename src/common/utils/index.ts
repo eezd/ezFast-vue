@@ -30,31 +30,26 @@ export function setCssVariableValue(cssVariableName: string, cssVariableValue: s
  * 参数处理
  * @param {*} params  参数
  */
-export function tansParams(params: Record<string, any>): string {
+export function tansParams(params: any) {
   let result = ""
   for (const propName of Object.keys(params)) {
     const value = params[propName]
-
-    // 跳过 null, undefined, 空字符串
-    if (value === null || value === undefined || value === "") {
-      continue
-    }
-
-    if (typeof value === "object") {
-      for (const key of Object.keys(value)) {
-        const subValue = value[key]
-        if (subValue !== null && subValue !== undefined && subValue !== "") {
-          // 正确编码嵌套键
-          const fullKey = `${propName}[${key}]`
-          result += `${encodeURIComponent(fullKey)}=${encodeURIComponent(subValue)}&`
+    const part = `${encodeURIComponent(propName)}=`
+    if (value !== null && value !== "" && typeof value !== "undefined") {
+      if (typeof value === "object") {
+        for (const key of Object.keys(value)) {
+          if (value[key] !== null && value[key] !== "" && typeof value[key] !== "undefined") {
+            const params = `${propName}[${key}]`
+            const subPart = `${encodeURIComponent(params)}=`
+            result += `${subPart + encodeURIComponent(value[key])}&`
+          }
         }
+      } else {
+        result += `${part + encodeURIComponent(value)}&`
       }
-    } else {
-      result += `${encodeURIComponent(propName)}=${encodeURIComponent(value)}&`
     }
   }
-
-  return result.slice(0, -1) // 去掉最后的 &
+  return result
 }
 
 // 验证是否为blob格式
