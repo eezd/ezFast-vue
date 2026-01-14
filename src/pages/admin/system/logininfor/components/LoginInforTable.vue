@@ -47,11 +47,15 @@ const selectedRows = ref<LoginInfoVO[]>([])
 const handleSelectionChange = (val: LoginInfoVO[]) => (selectedRows.value = val)
 
 async function handleClean() {
-  await ElMessageBox.confirm("是否确认清空所有登录日志数据项", "提示", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning"
-  })
+  try {
+    await ElMessageBox.confirm("是否确认清空所有登录日志数据项", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning"
+    })
+  } catch {
+    return
+  }
   await cleanSysLoginInfoApi()
   await getTableData()
   ElMessage.success("删除成功")

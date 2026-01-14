@@ -17,8 +17,7 @@ const emit = defineEmits<EmitEvents>()
  * defineModel
  */
 // #region defineModel
-const loading = defineModel<boolean>("loading", { required: true })
-const dialogVisible = defineModel<boolean>("dataDialogVisible", { required: true })
+const dialog = defineModel<DialogOption>("dialog", { required: true })
 const roleId = defineModel<number | string>(
   "roleId",
   {
@@ -56,7 +55,7 @@ async function handleCreateOrUpdate() {
   await authSysUserSelectAll({ roleId: roleId.value, userIds: ids })
   ElMessage.success("分配成功")
   await handleOk()
-  dialogVisible.value = false
+  dialog.value.visible = false
 }
 
 const tableData = ref<UserVO[]>([])
@@ -85,7 +84,7 @@ function resetSearch() {
  */
 async function getTableData(): Promise<void> {
   try {
-    loading.value = true
+    dialog.value.loading = true
     searchData.roleId = roleId.value
     const { rows, total } = await unallocatedSysUserListApi({
       ...searchData,
@@ -97,12 +96,12 @@ async function getTableData(): Promise<void> {
   } catch {
     tableData.value = []
   } finally {
-    loading.value = false
+    dialog.value.loading = false
   }
 }
 
-watch(dialogVisible, () => {
-  if (dialogVisible.value) {
+watch(() => dialog.value.visible, () => {
+  if (dialog.value.visible) {
     searchData.roleId = roleId.value
     getTableData()
   }
@@ -110,9 +109,9 @@ watch(dialogVisible, () => {
 </script>
 
 <template>
-  <el-dialog v-model="dialogVisible" title="选择用户" :width="isMobile ? '95%' : '820px'">
+  <el-dialog v-model="dialog.visible" title="选择用户" :width="isMobile ? '95%' : '820px'">
     <!-- 查询表单 -->
-    <el-card v-loading="loading" shadow="never" class="search-wrapper">
+    <el-card v-loading="dialog.loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
         <el-form-item prop="userName" label="用户名称">
           <el-input v-model="searchData.userName" placeholder="请输入用户名称" @keyup.enter="getTableData" />
@@ -164,10 +163,10 @@ watch(dialogVisible, () => {
       </div>
 
       <template #footer>
-        <el-button @click="dialogVisible = false">
+        <el-button @click="dialog.visible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="handleCreateOrUpdate" :loading="loading" :disabled="selectedRows.length === 0">
+        <el-button type="primary" @click="handleCreateOrUpdate" :loading="dialog.loading" :disabled="selectedRows.length === 0">
           确认
         </el-button>
       </template>

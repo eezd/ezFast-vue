@@ -10,8 +10,7 @@ const emit = defineEmits<EmitEvents>()
  * defineModel
  */
 // #region defineModel
-const loading = defineModel<boolean>("loading", { required: true })
-const dialogVisible = defineModel<boolean>("dataDialogVisible", { required: true })
+const dialog = defineModel<DialogOption>("dialog", { required: true })
 const menuTreeRef = defineModel<ElTreeInstance | null>("menuTreeRef", { required: true })
 const menuOptions = defineModel<MenuOptionsType[]>(
   "menuOptions",
@@ -31,8 +30,6 @@ export interface EmitEvents {
 const getTableData = () => emit("getTableData")
 // #endregion
 
-const title = "级联删除"
-
 // const { isMobile } = useDevice()
 
 /**
@@ -46,25 +43,25 @@ async function handleDeleteForm() {
   }
 
   try {
-    loading.value = true
+    dialog.value.loading = true
     await cascadeDelSysMenuApi(menuIds)
     await ElMessage.success("删除成功")
   } finally {
     // 新增/修改操作后刷新表格
     await getTableData()
-    dialogVisible.value = false
-    loading.value = false
+    dialog.value.visible = false
+    dialog.value.loading = false
   }
 }
 
 async function resetCancelCascade() {
   menuTreeRef.value?.setCheckedKeys([])
-  dialogVisible.value = false
+  dialog.value.visible = false
 }
 </script>
 
 <template>
-  <el-dialog v-model="dialogVisible" :title="title" @closed="resetCancelCascade" destroy-on-close append-to-bod width="750px">
+  <el-dialog v-model="dialog.visible" :title="dialog.title" @closed="resetCancelCascade" destroy-on-close append-to-bod width="750px">
     <el-tree
       ref="menuTreeRef"
       class="tree-border"
@@ -78,7 +75,7 @@ async function resetCancelCascade() {
     />
     <template #footer>
       <div class="dialog-footer">
-        <el-button type="primary" @click="handleDeleteForm" :loading="loading">
+        <el-button type="primary" @click="handleDeleteForm" :loading="dialog.loading">
           确 定
         </el-button>
         <el-button @click="resetCancelCascade">

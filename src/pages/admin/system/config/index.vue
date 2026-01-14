@@ -24,10 +24,12 @@ const loading = ref(true)
 const tableData = ref<ConfigForm[]>([])
 // 表单数据
 const formData = ref<Partial<ConfigForm>>(cloneDeep({}))
-// 数据弹窗
-const dataDialogVisible = ref<boolean>(false)
-// 数据弹窗的数据是否可编辑
-const isEditableInDataDialog = ref<boolean>(true)
+const dialog = reactive<DialogOption>({
+  title: "",
+  visible: false,
+  loading: false,
+  isEditable: false
+})
 
 // 分页
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
@@ -122,8 +124,9 @@ function handleExport() {
  */
 function openAddDialog() {
   formData.value = cloneDeep({})
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
+  dialog.title = "新增参数"
+  dialog.isEditable = true
+  dialog.visible = true
 }
 
 /**
@@ -132,15 +135,16 @@ function openAddDialog() {
  * @param row
  */
 async function openUpdateDialog(row: ConfigForm) {
-  loading.value = true
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
+  dialog.loading = true
+  dialog.title = "修改参数"
+  dialog.isEditable = true
+  dialog.visible = true
   try {
     formData.value = cloneDeep({})
     const { data } = await getSysConfigApi(row.configId)
     formData.value = data as ConfigForm
   } finally {
-    loading.value = false
+    dialog.loading = false
   }
 }
 
@@ -150,15 +154,16 @@ async function openUpdateDialog(row: ConfigForm) {
  * @param row
  */
 async function openShowDialog(row: ConfigForm) {
-  loading.value = true
-  isEditableInDataDialog.value = false
-  dataDialogVisible.value = true
+  dialog.loading = true
+  dialog.title = "查看参数"
+  dialog.isEditable = false
+  dialog.visible = true
   try {
     formData.value = cloneDeep({})
     const { data } = await getSysConfigApi(row.configId)
     formData.value = data as ConfigForm
   } finally {
-    loading.value = false
+    dialog.loading = false
   }
 }
 // #endregion
@@ -270,9 +275,7 @@ onMounted(async () => {
 
     <!-- 数据弹窗 -->
     <ConfigDialog
-      v-model:loading="loading"
-      v-model:data-dialog-visible="dataDialogVisible"
-      v-model:is-editable="isEditableInDataDialog"
+      v-model:dialog="dialog"
       v-model:form-data="formData"
       @get-table-data="getTableData"
     />

@@ -29,10 +29,13 @@ const tableData = ref<RoleForm[]>([])
 const DEFAULT_FORM_DATA = { status: "0", menuCheckStrictly: true }
 // 表单数据
 const formData = ref<Partial<RoleForm>>(cloneDeep(DEFAULT_FORM_DATA))
-// 数据弹窗
-const dataDialogVisible = ref<boolean>(false)
-// 数据弹窗的数据是否可编辑
-const isEditableInDataDialog = ref<boolean>(true)
+
+const dialog = reactive<DialogOption>({
+  title: "",
+  visible: false,
+  loading: false,
+  isEditable: false
+})
 
 const menuRef = ref<ElTreeInstance | null>(null)
 const menuOptions = ref<MenuTreeOption[]>([])
@@ -126,7 +129,7 @@ function handleExport() {
   download(
     "/system/Role/type/export",
     { ...searchData },
-    `Role_${timestamp}.xlsx`
+    `role_${timestamp}.xlsx`
   )
 }
 
@@ -135,32 +138,39 @@ function handleExport() {
  */
 function openAddDialog() {
   formData.value = cloneDeep(DEFAULT_FORM_DATA)
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
+  dialog.title = "新增角色"
+  dialog.isEditable = true
+  dialog.visible = true
 }
 
 /**
  * 打开修改弹窗
  */
 async function openUpdateDialog(row: RoleForm) {
-  loading.value = true
-  formData.value = cloneDeep({})
-  const roleId = row?.roleId
-  const { data } = await getSysRoleApi(roleId)
-  Object.assign(formData.value, data)
-  formData.value.roleSort = Number(formData.value.roleSort)
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
+  dialog.loading = true
+  dialog.title = "修改角色"
+  dialog.isEditable = true
+  dialog.visible = true
+  try {
+    formData.value = cloneDeep({})
+    const roleId = row?.roleId
+    const { data } = await getSysRoleApi(roleId)
+    Object.assign(formData.value, data)
+    formData.value.roleSort = Number(formData.value.roleSort)
+  } finally {
+    dialog.loading = false
+  }
 }
 
 /**
  * 打开查看弹窗
  */
 async function openShowDialog(row: RoleForm) {
-  loading.value = true
+  dialog.loading = true
+  dialog.title = "查看角色"
   formData.value = cloneDeep(row)
-  isEditableInDataDialog.value = false
-  dataDialogVisible.value = true
+  dialog.isEditable = false
+  dialog.visible = true
 }
 // #endregion
 
@@ -283,10 +293,8 @@ onMounted(async () => {
 
     <!-- 数据弹窗 -->
     <RoleDialog
+      v-model:dialog="dialog"
       v-model:menu-ref="menuRef"
-      v-model:loading="loading"
-      v-model:data-dialog-visible="dataDialogVisible"
-      v-model:is-editable="isEditableInDataDialog"
       v-model:form-data="formData"
       v-model:menu-options="menuOptions"
       @get-table-data="getTableData"

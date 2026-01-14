@@ -27,10 +27,12 @@ const loading = ref(true)
 const tableData = ref<DictDataForm[]>([])
 // 表单数据
 const formData = ref<Partial<DictDataForm>>(cloneDeep({}))
-// 数据弹窗
-const dataDialogVisible = ref<boolean>(false)
-// 数据弹窗的数据是否可编辑
-const isEditableInDataDialog = ref<boolean>(true)
+const dialog = reactive<DialogOption>({
+  title: "",
+  visible: false,
+  loading: false,
+  isEditable: false
+})
 
 // 分页
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
@@ -128,8 +130,9 @@ function handleExport() {
  */
 function openAddDialog() {
   formData.value = cloneDeep({ dictType: defaultDictType.value, dictSort: 0 })
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
+  dialog.title = "新增字典数据"
+  dialog.isEditable = true
+  dialog.visible = true
 }
 
 /**
@@ -138,15 +141,16 @@ function openAddDialog() {
  * @param row
  */
 async function openUpdateDialog(row: DictDataForm) {
-  loading.value = true
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
+  dialog.loading = true
+  dialog.title = "修改字典数据"
+  dialog.isEditable = true
+  dialog.visible = true
   try {
     formData.value = cloneDeep({})
     const { data } = await getSysDictDataCodeApi(row.dictCode)
     formData.value = data as DictDataForm
   } finally {
-    loading.value = false
+    dialog.loading = false
   }
 }
 
@@ -156,15 +160,16 @@ async function openUpdateDialog(row: DictDataForm) {
  * @param row
  */
 async function openShowDialog(row: DictDataForm) {
-  loading.value = true
-  isEditableInDataDialog.value = false
-  dataDialogVisible.value = true
+  dialog.loading = true
+  dialog.title = "查看字典数据"
+  dialog.isEditable = false
+  dialog.visible = true
   try {
     formData.value = cloneDeep({})
     const { data } = await getSysDictDataCodeApi(row.dictCode)
     formData.value = data as DictDataForm
   } finally {
-    loading.value = false
+    dialog.loading = false
   }
 }
 // #endregion
@@ -266,9 +271,7 @@ onMounted(async () => {
 
     <!-- 数据弹窗 -->
     <DictDataDialog
-      v-model:loading="loading"
-      v-model:data-dialog-visible="dataDialogVisible"
-      v-model:is-editable="isEditableInDataDialog"
+      v-model:dialog="dialog"
       v-model:form-data="formData"
       @get-table-data="getTableData"
     />

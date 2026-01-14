@@ -31,10 +31,13 @@ const tableData = ref<UserVO[]>([])
 const DEFAULT_FORM_DATA = { status: "0" }
 // 表单数据
 const formData = ref<Partial<UserForm>>(cloneDeep(DEFAULT_FORM_DATA))
-// 数据弹窗
-const dataDialogVisible = ref<boolean>(false)
-// 数据弹窗的数据是否可编辑
-const isEditableInDataDialog = ref<boolean>(true)
+
+const dialog = reactive<DialogOption>({
+  title: "",
+  visible: false,
+  loading: false,
+  isEditable: false
+})
 
 const roleOptions = ref<RoleVO[]>([])
 const initPassword = ref<string>("")
@@ -132,16 +135,17 @@ function handleExport() {
  * 打开新增弹窗
  */
 async function openAddDialog() {
-  loading.value = true
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
+  dialog.loading = true
+  dialog.title = "新增用户"
+  dialog.isEditable = true
+  dialog.visible = true
   try {
     formData.value = cloneDeep({})
     const { data } = await getSysUserApi()
     roleOptions.value = data.roles
     formData.value.password = initPassword.value.toString()
   } finally {
-    loading.value = false
+    dialog.loading = false
   }
 }
 
@@ -149,9 +153,10 @@ async function openAddDialog() {
  * 打开修改弹窗
  */
 async function openUpdateDialog(row: UserForm) {
-  loading.value = true
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
+  dialog.loading = true
+  dialog.title = "修改用户"
+  dialog.isEditable = true
+  dialog.visible = true
   try {
     formData.value = cloneDeep({})
     const userId = row?.userId
@@ -163,7 +168,7 @@ async function openUpdateDialog(row: UserForm) {
     formData.value.roleIds = data.roleIds
     formData.value.password = ""
   } finally {
-    loading.value = false
+    dialog.loading = false
   }
 }
 
@@ -171,9 +176,10 @@ async function openUpdateDialog(row: UserForm) {
  * 打开查看弹窗
  */
 async function openShowDialog(row: UserForm) {
-  loading.value = true
-  isEditableInDataDialog.value = false
-  dataDialogVisible.value = true
+  dialog.loading = true
+  dialog.title = "查看用户"
+  dialog.isEditable = false
+  dialog.visible = true
   try {
     formData.value = cloneDeep({})
     const userId = row?.userId
@@ -185,7 +191,7 @@ async function openShowDialog(row: UserForm) {
     formData.value.roleIds = data.roleIds
     formData.value.password = ""
   } finally {
-    loading.value = false
+    dialog.loading = false
   }
 }
 
@@ -345,9 +351,7 @@ onMounted(async () => {
 
     <!-- 数据弹窗 -->
     <UserDialog
-      v-model:loading="loading"
-      v-model:data-dialog-visible="dataDialogVisible"
-      v-model:is-editable="isEditableInDataDialog"
+      v-model:dialog="dialog"
       v-model:form-data="formData"
       v-model:role-options="roleOptions"
       @get-table-data="getTableData"

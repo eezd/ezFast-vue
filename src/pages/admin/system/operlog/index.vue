@@ -24,7 +24,12 @@ const tableData = ref<OperLogVO[]>([])
 // 表单数据
 const formData = ref<Partial<OperLogForm>>(cloneDeep({}))
 // 数据弹窗
-const dataDialogVisible = ref<boolean>(false)
+const dialog = reactive<DialogOption>({
+  title: "",
+  visible: false,
+  loading: false,
+  isEditable: false
+})
 
 // 分页
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
@@ -122,10 +127,11 @@ function handleExport() {
  * @param row
  */
 async function openShowDialog(row: OperLogForm) {
-  loading.value = true
+  dialog.loading = true
   formData.value = cloneDeep(row)
-  dataDialogVisible.value = true
-  loading.value = false
+  dialog.title = "查看操作日志"
+  dialog.visible = true
+  dialog.loading = false
 }
 // #endregion
 
@@ -222,7 +228,7 @@ onMounted(async () => {
 
     <!-- 数据弹窗 -->
     <OperLogDialog
-      v-model:data-dialog-visible="dataDialogVisible"
+      v-model:dialog="dialog"
       v-model:form-data="formData"
     />
   </div>

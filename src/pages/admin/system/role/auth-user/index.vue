@@ -29,8 +29,12 @@ const loading = ref(true)
 // 表格数据
 const tableData = ref<UserVO[]>([])
 
-// 数据弹窗
-const dataDialogVisible = ref<boolean>(false)
+const dialog = reactive<DialogOption>({
+  title: "",
+  visible: false,
+  loading: false,
+  isEditable: false
+})
 
 // 分页
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
@@ -112,7 +116,8 @@ function handleExport() {
  * 打开新增弹窗
  */
 function openAddDialog() {
-  dataDialogVisible.value = true
+  dialog.title = "新增用户"
+  dialog.visible = true
 }
 
 /**
@@ -201,8 +206,7 @@ onMounted(async () => {
 
     <!-- 数据弹窗 -->
     <AuthUserDialog
-      v-model:loading="loading"
-      v-model:data-dialog-visible="dataDialogVisible"
+      v-model:dialog="dialog"
       v-model:role-id="getRoleId"
       @handle-ok="getTableData"
     />

@@ -23,10 +23,13 @@ const loading = ref(true)
 const tableData = ref<NoticeForm[]>([])
 // 表单数据
 const formData = ref<Partial<NoticeForm>>(cloneDeep({}))
-// 数据弹窗
-const dataDialogVisible = ref<boolean>(false)
-// 数据弹窗的数据是否可编辑
-const isEditableInDataDialog = ref<boolean>(true)
+
+const dialog = reactive<DialogOption>({
+  title: "",
+  visible: false,
+  loading: false,
+  isEditable: false
+})
 
 // 分页
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
@@ -109,8 +112,9 @@ async function handleDelete(row: NoticeForm | NoticeForm[]) {
  */
 function openAddDialog() {
   formData.value = cloneDeep({})
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
+  dialog.title = "新增公告"
+  dialog.isEditable = true
+  dialog.visible = true
 }
 
 /**
@@ -119,15 +123,16 @@ function openAddDialog() {
  * @param row
  */
 async function openUpdateDialog(row: NoticeForm) {
-  loading.value = true
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
+  dialog.loading = true
+  dialog.title = "修改公告"
+  dialog.isEditable = true
+  dialog.visible = true
   try {
     formData.value = cloneDeep({})
     const { data } = await getSysNoticeApi(row.noticeId)
     formData.value = data as NoticeForm
   } finally {
-    loading.value = false
+    dialog.loading = false
   }
 }
 
@@ -137,15 +142,16 @@ async function openUpdateDialog(row: NoticeForm) {
  * @param row
  */
 async function openShowDialog(row: NoticeForm) {
-  loading.value = true
-  isEditableInDataDialog.value = false
-  dataDialogVisible.value = true
+  dialog.loading = true
+  dialog.title = "查看公告"
+  dialog.isEditable = false
+  dialog.visible = true
   try {
     formData.value = cloneDeep({})
     const { data } = await getSysNoticeApi(row.noticeId)
     formData.value = data as NoticeForm
   } finally {
-    loading.value = false
+    dialog.loading = false
   }
 }
 // #endregion
@@ -245,9 +251,7 @@ onMounted(async () => {
 
     <!-- 数据弹窗 -->
     <NoticeDialog
-      v-model:loading="loading"
-      v-model:data-dialog-visible="dataDialogVisible"
-      v-model:is-editable="isEditableInDataDialog"
+      v-model:dialog="dialog"
       v-model:form-data="formData"
       @get-table-data="getTableData"
     />

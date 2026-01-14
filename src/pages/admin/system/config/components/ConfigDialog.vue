@@ -6,7 +6,6 @@ import { useDevice } from "@@/composables/useDevice.ts"
 import { useDict } from "@@/composables/useDict.ts"
 import { ElMessage } from "element-plus"
 import { cloneDeep } from "lodash-es"
-import { computed, ref } from "vue"
 
 const emit = defineEmits<EmitEvents>()
 
@@ -14,9 +13,7 @@ const emit = defineEmits<EmitEvents>()
  * defineModel
  */
 // #region defineModel
-const loading = defineModel<boolean>("loading", { required: true })
-const isEditable = defineModel<boolean>("isEditable", { default: false })
-const dialogVisible = defineModel<boolean>("dataDialogVisible", { required: true })
+const dialog = defineModel<DialogOption>("dialog", { required: true })
 const formData = defineModel<Partial<ConfigForm>>(
   "formData",
   {
@@ -36,11 +33,6 @@ const getTableData = () => emit("getTableData")
 // #endregion
 
 const { sys_yes_no } = toRefs<any>(useDict("sys_yes_no"))
-
-const title = computed(() => {
-  if (!isEditable.value) return "查看参数"
-  return formData.value.configId === undefined ? "新增参数" : "编辑参数"
-})
 
 const { isMobile } = useDevice()
 
@@ -78,7 +70,7 @@ function handleCreateOrUpdate() {
     // (valid: boolean, fields)
     if (valid) {
       try {
-        loading.value = true
+        dialog.value.loading = true
         const isCreating = formData.value.configId === undefined
         if (isCreating) {
           const res = await addSysConfigApi(formData.value as ConfigForm)
@@ -90,8 +82,8 @@ function handleCreateOrUpdate() {
       } finally {
         // 新增/修改操作后刷新表格
         await getTableData()
-        dialogVisible.value = false
-        loading.value = false
+        dialog.value.visible = false
+        dialog.value.loading = false
       }
     }
   })
@@ -108,37 +100,56 @@ function resetForm() {
 </script>
 
 <template>
-  <el-dialog v-model="dialogVisible" :title="title" @closed="resetForm" :width="isMobile ? '90%' : '40%'">
-    <el-form ref="formRef" v-loading="loading" label-width="80px" :model="formData" :rules="formRules" label-position="left">
-      <el-form-item prop="configName" label="参数名称">
-        <el-input v-model="formData.configName" placeholder="请输入参数名称" :disabled="!isEditable" />
-      </el-form-item>
-      <el-form-item prop="configKey" label="参数键名">
-        <el-input v-model="formData.configKey" placeholder="请输入参数键名" :disabled="!isEditable" />
-      </el-form-item>
-      <el-form-item prop="configValue" label="参数键值">
-        <el-input v-model="formData.configValue" placeholder="请输入参数键值" :disabled="!isEditable" />
-      </el-form-item>
-      <el-form-item prop="configType" label="系统内置">
-        <el-radio-group v-model="formData.configType">
-          <el-radio v-for="dict in sys_yes_no" :key="dict.value" :value="dict.value">
-            {{ dict.label }}
-          </el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item prop="remark" label="备注">
-        <el-input v-model="formData.remark" type="textarea" placeholder="请输入备注" :disabled="!isEditable" />
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <el-button @click="dialogVisible = false">
-        取消
-      </el-button>
-      <el-button type="primary" @click="handleCreateOrUpdate" :loading="loading" :disabled="!isEditable">
-        确认
-      </el-button>
+  <el-drawer
+    v-model="dialog.visible"
+    :title="dialog.title"
+    direction="rtl"
+    :size="isMobile ? '90%' : '40%'"
+    @closed="resetForm"
+    class="system-drawer"
+    modal-class="system-drawer-modal"
+    :lock-scroll="true"
+    destroy-on-close
+  >
+    <template #header="{ titleId, titleClass }">
+      <div :id="titleId" :class="titleClass" class="drawer-header">
+        <span>{{ dialog.title }}</span>
+      </div>
     </template>
-  </el-dialog>
+    <div class="drawer-content">
+      <el-form ref="formRef" v-loading="dialog.loading" label-width="auto" :model="formData" :rules="formRules" label-position="left">
+        <el-form-item prop="configName" label="参数名称">
+          <el-input v-model="formData.configName" placeholder="请输入参数名称" :disabled="!dialog.isEditable" />
+        </el-form-item>
+        <el-form-item prop="configKey" label="参数键名">
+          <el-input v-model="formData.configKey" placeholder="请输入参数键名" :disabled="!dialog.isEditable" />
+        </el-form-item>
+        <el-form-item prop="configValue" label="参数键值">
+          <el-input v-model="formData.configValue" placeholder="请输入参数键值" :disabled="!dialog.isEditable" />
+        </el-form-item>
+        <el-form-item prop="configType" label="系统内置">
+          <el-radio-group v-model="formData.configType">
+            <el-radio v-for="dict in sys_yes_no" :key="dict.value" :value="dict.value">
+              {{ dict.label }}
+            </el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item prop="remark" label="备注">
+          <el-input v-model="formData.remark" type="textarea" placeholder="请输入备注" :disabled="!dialog.isEditable" />
+        </el-form-item>
+      </el-form>
+    </div>
+    <template #footer>
+      <div class="drawer-footer">
+        <el-button class="btn-cancel" @click="dialog.visible = false">
+          取消
+        </el-button>
+        <el-button class="btn-submit" type="primary" @click="handleCreateOrUpdate" :loading="dialog.loading" :disabled="!dialog.isEditable">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <style lang="scss" scoped>

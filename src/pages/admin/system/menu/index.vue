@@ -56,10 +56,12 @@ const menuOptions = ref<MenuOptionsType[]>([])
 const DEFAULT_FORM_DATA = { orderNum: 1, menuType: MenuTypeEnum.M }
 // 表单数据
 const formData = ref<Partial<MenuForm>>(cloneDeep(DEFAULT_FORM_DATA))
-// 数据弹窗
-const dataDialogVisible = ref<boolean>(false)
-// 数据弹窗的数据是否可编辑
-const isEditableInDataDialog = ref<boolean>(true)
+const dialog = reactive<DialogOption>({
+  title: "",
+  visible: false,
+  loading: false,
+  isEditable: false
+})
 
 // #region 搜索栏
 const searchData = reactive({
@@ -191,9 +193,10 @@ async function handleDelete(row: MenuForm) {
  */
 function openAddDialog() {
   formData.value = cloneDeep(DEFAULT_FORM_DATA)
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
-  loading.value = false
+  dialog.title = "新增菜单"
+  dialog.loading = false
+  dialog.isEditable = true
+  dialog.visible = true
 }
 
 /**
@@ -202,10 +205,10 @@ function openAddDialog() {
 function openAddSubDialog(parentId: number) {
   formData.value = cloneDeep(DEFAULT_FORM_DATA)
   formData.value.parentId = parentId
-  console.log(formData.value)
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
-  loading.value = false
+  dialog.loading = false
+  dialog.title = "新增子菜单"
+  dialog.isEditable = true
+  dialog.visible = true
 }
 
 /**
@@ -214,15 +217,16 @@ function openAddSubDialog(parentId: number) {
  * @param row
  */
 async function openUpdateDialog(row: MenuForm) {
-  loading.value = true
-  isEditableInDataDialog.value = true
-  dataDialogVisible.value = true
+  dialog.loading = true
+  dialog.title = "修改菜单"
+  dialog.isEditable = true
+  dialog.visible = true
   try {
     formData.value = cloneDeep({})
     const { data } = await getSysMenuApi(row.menuId)
     formData.value = data as MenuForm
   } finally {
-    loading.value = false
+    dialog.loading = false
   }
 }
 
@@ -232,28 +236,34 @@ async function openUpdateDialog(row: MenuForm) {
  * @param row
  */
 async function openShowDialog(row: MenuForm) {
-  loading.value = true
-  isEditableInDataDialog.value = false
-  dataDialogVisible.value = true
+  dialog.loading = true
+  dialog.title = "查看菜单"
+  dialog.isEditable = false
+  dialog.visible = true
   try {
     formData.value = cloneDeep({})
     const { data } = await getSysMenuApi(row.menuId)
     formData.value = data as MenuForm
   } finally {
-    loading.value = false
+    dialog.loading = false
   }
 }
 // #endregion
 
 // #region 联删除
 const menuTreeRef = ref<ElTreeInstance | null>(null)
-// 级连删除弹窗
-const cascadeDeleteDialogVisible = ref<boolean>(false)
+const menuCascadeDeleteDialog = reactive<DialogOption>({
+  title: "",
+  visible: false,
+  loading: false,
+  isEditable: false
+})
 /**
  * 打开级联删除弹窗
  */
 async function openCascadeDeleteDialog() {
-  cascadeDeleteDialogVisible.value = true
+  menuCascadeDeleteDialog.title = "级联删除"
+  menuCascadeDeleteDialog.visible = true
 }
 // #endregion
 
@@ -344,9 +354,7 @@ onMounted(async () => {
 
     <!-- 数据弹窗 -->
     <DictDataDialog
-      v-model:loading="loading"
-      v-model:data-dialog-visible="dataDialogVisible"
-      v-model:is-editable="isEditableInDataDialog"
+      v-model:dialog="dialog"
       v-model:form-data="formData"
       v-model:menu-options="menuOptions"
       @get-table-data="getTableData"
@@ -355,8 +363,7 @@ onMounted(async () => {
     <!-- 数据弹窗 -->
     <MenuCascadeDeleteDialog
       v-model:menu-tree-ref="menuTreeRef"
-      v-model:loading="loading"
-      v-model:data-dialog-visible="cascadeDeleteDialogVisible"
+      v-model:dialog="menuCascadeDeleteDialog"
       v-model:menu-options="menuOptions"
       @get-table-data="getTableData"
     />

@@ -10,7 +10,7 @@ import VueJsonPretty from "vue-json-pretty"
  * defineModel
  */
 // #region defineModel
-const dialogVisible = defineModel<boolean>("dataDialogVisible", { required: true })
+const dialog = defineModel<DialogOption>("dialog", { required: true })
 const formData = defineModel<Partial<OperLogForm>>(
   "formData",
   {
@@ -52,7 +52,7 @@ function resetForm() {
 </script>
 
 <template>
-  <el-dialog v-model="dialogVisible" :title="title" @closed="resetForm" :width="isMobile ? '90%' : '40%'">
+  <el-dialog v-model="dialog.visible" :title="dialog.title" @closed="resetForm" :width="isMobile ? '90%' : '40%'">
     <el-descriptions v-if="formData" :column="1" border>
       <el-descriptions-item label="操作状态">
         <template #default>

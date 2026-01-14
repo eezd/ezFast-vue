@@ -27,6 +27,14 @@ declare global {
      * 是否显示
      */
     visible: boolean
+    /**
+     * 加载状态
+     */
+    loading: boolean
+    /**
+     * 是否可编辑
+     */
+    isEditable?: boolean
   }
 
   declare interface UploadOption {
@@ -35,23 +43,6 @@ declare global {
 
     /** 上传的地址 */
     url: string
-  }
-
-  /**
-   * 导入属性
-   */
-  declare interface ImportOption extends UploadOption {
-    /** 是否显示弹出层 */
-    open: boolean
-    /** 弹出层标题 */
-    title: string
-    /** 是否禁用上传 */
-    isUploading: boolean
-
-    updateSupport: number
-
-    /** 其他参数 */
-    [key: string]: any
   }
 
   /**
