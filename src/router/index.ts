@@ -76,6 +76,15 @@ export const dynamicRoutes: RouteRecordRaw[] = [
         }
       },
       {
+        path: "profile",
+        component: () => import("@/pages/admin/profile/index.vue"),
+        name: "Profile",
+        meta: {
+          title: "个人中心",
+          hidden: true
+        }
+      },
+      {
         path: "system",
         redirect: "/admin/system/dashboard",
         meta: {
