@@ -214,6 +214,25 @@ export const dynamicRoutes: RouteRecordRaw[] = [
             }
           },
           {
+            path: "oss",
+            component: () => import("@/pages/admin/system/oss/index.vue"),
+            name: "AdminSysOss",
+            meta: {
+              title: "文件管理",
+              svgIcon: "upload",
+              permissions: ["system:oss:list"]
+            }
+          },
+          {
+            path: "oss-config",
+            component: () => import("@/pages/admin/system/oss-config/index.vue"),
+            name: "AdminSysOssConfig",
+            meta: {
+              title: "对象存储配置",
+              hidden: true
+            }
+          },
+          {
             path: "client",
             component: () => import("@/pages/admin/system/client/index.vue"),
             name: "AdminSysClient",

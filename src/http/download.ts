@@ -1,11 +1,13 @@
 import type { LoadingInstance } from "element-plus/es/components/loading/src/loading"
 import { blobValidate, tansParams } from "@@/utils"
 import errorCode from "@@/utils/errorCode"
+import axios from "axios"
 import { ElLoading, ElMessage } from "element-plus"
 import FileSaver from "file-saver"
-import { request } from "@/http/axios"
+import { globalHeaders, request } from "@/http/axios"
 
 let downloadLoadingInstance: LoadingInstance | null = null
+const baseURL = import.meta.env.VITE_BASE_URL
 
 /**
  * 通用下载方法
@@ -118,3 +120,63 @@ const handleExportGet = () => {
 };
 </script>
 */
+
+/**
+ * 下载 OSS 文件
+ */
+export async function downloadOss(ossId: string | number) {
+  const url = `${baseURL}/resource/oss/download/${ossId}`
+  downloadLoadingInstance = ElLoading.service({ text: "正在下载数据，请稍候", background: "rgba(0, 0, 0, 0.7)" })
+  try {
+    const res = await axios({
+      method: "get",
+      url,
+      responseType: "blob",
+      headers: globalHeaders()
+    })
+    const isBlob = blobValidate(res.data)
+    if (isBlob) {
+      const blob = new Blob([res.data], { type: "application/octet-stream" })
+      FileSaver.saveAs(blob, decodeURIComponent(res.headers["download-filename"] as string))
+    } else {
+      printErrMsg(res.data)
+    }
+    downloadLoadingInstance.close()
+  } catch (r) {
+    console.error(r)
+    ElMessage.error("下载文件出现错误，请联系管理员！")
+    downloadLoadingInstance.close()
+  }
+}
+
+export async function downloadZip(url: string, name: string) {
+  url = baseURL + url
+  downloadLoadingInstance = ElLoading.service({ text: "正在下载数据，请稍候", background: "rgba(0, 0, 0, 0.7)" })
+  try {
+    const res = await axios({
+      method: "get",
+      url,
+      responseType: "blob",
+      headers: globalHeaders()
+    })
+    const isBlob = blobValidate(res.data)
+    if (isBlob) {
+      const blob = new Blob([res.data], { type: "application/zip" })
+      FileSaver.saveAs(blob, name)
+    } else {
+      printErrMsg(res.data)
+    }
+    downloadLoadingInstance.close()
+  } catch (r) {
+    console.error(r)
+    ElMessage.error("下载文件出现错误，请联系管理员！")
+    downloadLoadingInstance.close()
+  }
+}
+
+async function printErrMsg(data: any) {
+  const resText = await data.text()
+  const rspObj = JSON.parse(resText)
+  const errMsg = errorCode[rspObj.code] || rspObj.msg || errorCode.default
+  ElMessage.error(errMsg)
+}
